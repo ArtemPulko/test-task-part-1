@@ -1,6 +1,6 @@
-from pages.onliner_phone_page import OnlinerMobilePhonePage
-from pages.onliner_catalog_page import OnlinerMobilePage
-from pages.onliner_compare_page import ComparePage
+from main.pages.onliner_phone_page import OnlinerMobilePhonePage
+from main.pages.onliner_catalog_page import OnlinerMobilePage
+from main.pages.onliner_compare_page import ComparePage
 import pytest
 import time
 

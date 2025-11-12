@@ -16,12 +16,12 @@ def driver():
     return chrome_browser
 @pytest.fixture
 def compare_cookies_path():
-    project_root = Path(__file__).parent
-    cookies_file = project_root / 'cookies' / 'cookies_test_prise_range.json'
+    project_root = Path(__file__).parents[2]
+    cookies_file = project_root / 'resources' / 'cookies' / 'cookies_test_prise_range.json'
     return cookies_file
 @pytest.fixture
 def authorization_cookies_path():
-    project_root = Path(__file__).parent
-    cookies_file = project_root / 'cookies' / 'cookies.json'
+    project_root = Path(__file__).parents[2]
+    cookies_file = project_root / 'resources' / 'cookies' / 'cookies.json'
     return cookies_file
 

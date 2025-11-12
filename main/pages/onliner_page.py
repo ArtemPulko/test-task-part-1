@@ -2,7 +2,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
-from pages.base_page import BasePage
+from main.pages.base_page import BasePage
 
 mobilePhone_selector = (By.XPATH, '(//a[@class="project-navigation__link project-navigation__link_primary"])[1]')
 

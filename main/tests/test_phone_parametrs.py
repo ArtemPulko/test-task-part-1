@@ -1,5 +1,5 @@
-from pages.onliner_phone_page import OnlinerMobilePhonePage
-from pages.onliner_catalog_page import OnlinerMobilePage
+from main.pages.onliner_phone_page import OnlinerMobilePhonePage
+from main.pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains, Keys
 import pytest
 
