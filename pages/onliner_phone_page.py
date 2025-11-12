@@ -1,5 +1,5 @@
 from selenium.webdriver.common.by import By
-from Pages.base_page import BasePage
+from pages.base_page import BasePage
 
 compare_link_locator = (By.XPATH, "//a[@class='catalog-interaction__sub catalog-interaction__sub_main']")
 

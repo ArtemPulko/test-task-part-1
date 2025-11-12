@@ -15,25 +15,27 @@ class BasePage:
         wait = WebDriverWait(self.browser, 10)
         return  wait.until(EC.presence_of_element_located(locator))
 
-    def authorization(self, browser):
+    def authorization(self, browser, path):
         """
         Загрузка куков с заранее авторизованным пользователем.
         :param browser: Сетевой драйвер Chrome.
+        :param path: Путь к кукам для авторизации
         """
         browser.delete_all_cookies()
-        with open('cookies/cookies.json', 'r') as file:
+        with open(path, 'r') as file:
             cookies = json.load(file)
         for cookie in cookies:
             browser.add_cookie(cookie)
         browser.refresh()
 
-    def set_compare(self, browser):
+    def set_compare(self, browser, path):
         """
         Загрузка куков с заранее авторизованным пользователем и выбранными телефонами.
         :param browser: Сетевой драйвер Chrome.
+        :param path: Путь к кукам для сравнения телефонов
         """
         browser.delete_all_cookies()
-        with open('cookies/cookies_test_prise_range.json', 'r') as file:
+        with open(path, 'r') as file:
             cookies = json.load(file)
         for cookie in cookies:
             browser.add_cookie(cookie)

@@ -1,5 +1,5 @@
 from selenium.webdriver.common.by import By
-from Pages.base_page import BasePage
+from pages.base_page import BasePage
 
 class ComparePage(BasePage):
     def __init__(self, driver):

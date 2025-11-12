@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -12,4 +14,14 @@ def driver():
     chrome_browser = webdriver.Chrome(service=service, options=options)
     chrome_browser.maximize_window()
     return chrome_browser
+@pytest.fixture
+def compare_cookies_path():
+    project_root = Path(__file__).parent
+    cookies_file = project_root / 'cookies' / 'cookies_test_prise_range.json'
+    return cookies_file
+@pytest.fixture
+def authorization_cookies_path():
+    project_root = Path(__file__).parent
+    cookies_file = project_root / 'cookies' / 'cookies.json'
+    return cookies_file
 

@@ -1,4 +1,4 @@
-from Pages.onliner_page import OnlinerPage
+from pages.onliner_page import OnlinerPage
 
 def test_mobile_phone_btn(driver):
     """

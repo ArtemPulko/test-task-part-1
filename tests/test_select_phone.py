@@ -1,10 +1,10 @@
-from Pages.onliner_catalog_page import OnlinerMobilePage
+from pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains
 import numpy as np
 import pytest
 
 @pytest.mark.parametrize('search',[(2, 10, [])])
-def test_select_phones(driver, search):
+def test_select_phones(driver, search, authorization_cookies_path):
     """
     Найти два любых телефона из первых 10 и добавить их для сравнения.
     Проверить, что ссылка для сравнения существует и флажки установлены.
@@ -13,11 +13,12 @@ def test_select_phones(driver, search):
         phone_count: количество искомых телефонов (по условию - 2)
         search_range: диапазон поиска первых телефонов (по условию - 10)
         selected_mobile_phone_list: пустой список, заготовка для поиска телефонов.
+    :param authorization_cookies_path: Путь к кукам для авторизации
     """
     catalog_page = OnlinerMobilePage(driver)
     catalog_page.open()
     #Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    catalog_page.authorization(driver)
+    catalog_page.authorization(driver, authorization_cookies_path)
     driver.implicitly_wait(5)
     #Закрываю еще одно всплывшее окно
     catalog_page.accept_city_btn.click()
@@ -42,7 +43,7 @@ def test_select_phones(driver, search):
     assert catalog_page.comparison_link.is_displayed(), "Ссылка на сравнение не найдена"
 
 @pytest.mark.parametrize('params',[(10, 2, [],[])])
-def test_price_screen_range(driver, params):
+def test_price_screen_range(driver, params, compare_cookies_path):
     """
     Установить параметры поиска: цена (минимальная и максимальная),
     размер экрана (минимальный и максимальный) - соответствующие минимальным и максимальным параметрам выбранных телефонов.
@@ -53,13 +54,14 @@ def test_price_screen_range(driver, params):
         phone_count: Количество выбранных телефонов (как по условию - 2)
         price_list: Пустой список, заготовка под цены телефонов
         screen_size Пустой список, заготовка под размеры экранов
+    :param compare_cookies_path: Путь к кукам для сравнения телефонов
     """
     onliner_mobile_catalog_page = OnlinerMobilePage(driver)
     onliner_mobile_catalog_page.open()
     #По условию телефоны должны соответствовать выбранным из теста: test_select_phones
     #Поэтому загружаю куки с заранее подготовленными телефонами для обеспечения независимости тестов друг от друга
     #Тест может не сработает если onliner перемешает телефоны в каталоге
-    onliner_mobile_catalog_page.set_compare(driver)
+    onliner_mobile_catalog_page.set_compare(driver, compare_cookies_path)
     first_phons_of, phone_count, price_list, screen_size = params
     actions = ActionChains(driver)
     #Собираю информацию о телефонах

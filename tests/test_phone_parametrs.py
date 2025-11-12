@@ -1,23 +1,24 @@
-from Pages.onliner_phone_page import OnlinerMobilePhonePage
-from Pages.onliner_catalog_page import OnlinerMobilePage
+from pages.onliner_phone_page import OnlinerMobilePhonePage
+from pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains, Keys
 import pytest
 
 @pytest.mark.parametrize('phone_index', [1])
-def test_phons_equals(driver,phone_index):
+def test_phons_equals(driver,phone_index, compare_cookies_path):
     """
     Перейти на любой из выбранных телефонов.
     Проверить, совпадают ли параметры с предыдущей страницей
     (операционная система, размер экрана, диагональ экрана, объем оперативной памяти).
     :param driver: Сетевой драйвер Chrome
     :param phone_index: номер телефона по списку из тех что выбран для сравнения (в соответствии с условием может быть 1 или 2)
+    :param compare_cookies_path: Путь к кукам для сравнения
     """
     catalog_page = OnlinerMobilePage(driver)
     catalog_page.open()
     #По условию телефоны должны соответствовать выбранным из теста: test_select_phones
     #Поэтому загружаю куки с заранее подготовленными телефонами для обеспечения независимости тестов друг от друга
     #Тест может не сработает если onliner перемешает телефоны в каталоге
-    catalog_page.set_compare(driver)
+    catalog_page.set_compare(driver, compare_cookies_path)
     actions = ActionChains(driver)
     #Листаю страницу до выбранного телефона (в противном случае информация не считывается)
     actions.move_to_element(catalog_page.selected_phone(phone_index)).perform()
