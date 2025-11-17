@@ -33,4 +33,4 @@ pip install numpy
 
 Список всех пакетов можно найти в файле requirements.txt
 
-Запуск всех тестов через терменал: python main.py
+Запуск всех тестов через терминал: python main.py
