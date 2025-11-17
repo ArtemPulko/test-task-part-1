@@ -3,6 +3,7 @@ from main.pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains, Keys
 import pytest
 
+@pytest.mark.run(order=4)
 @pytest.mark.parametrize('phone_index', [(1,2,10)])
 def test_phons_equals(driver, phone_index, authorization_cookies_path):
     """
@@ -17,13 +18,7 @@ def test_phons_equals(driver, phone_index, authorization_cookies_path):
     :param authorization_cookies_path: Путь к кукам для сравнения
     """
     catalog_page = OnlinerMobilePage(driver)
-    catalog_page.open()
-    # Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    catalog_page.authorization(driver, authorization_cookies_path)
-    catalog_page.accept_city_btn.click()
     phone_index, phone_count, search_range = phone_index
-    # Выбираю 2 случайных телефона из 10
-    catalog_page.choice_telephone(driver, phone_count, search_range)
     actions = ActionChains(driver)
     #Листаю страницу до выбранного телефона (в противном случае информация не считывается)
     actions.move_to_element(catalog_page.selected_phone(phone_index)).perform()

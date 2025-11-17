@@ -1,9 +1,8 @@
 from main.pages.onliner_phone_page import OnlinerMobilePhonePage
-from main.pages.onliner_catalog_page import OnlinerMobilePage
 from main.pages.onliner_compare_page import ComparePage
 import pytest
-import time
 
+@pytest.mark.run(order=5)
 @pytest.mark.parametrize('phone', [(2, 10)])
 def test_compare_phons(driver, phone, authorization_cookies_path):
     """
@@ -16,17 +15,10 @@ def test_compare_phons(driver, phone, authorization_cookies_path):
     :param authorization_cookies_path: Путь к кукам для сравнения
     :return:
     """
-    catalog_page = OnlinerMobilePage(driver)
-    catalog_page.open()
-    # Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    catalog_page.authorization(driver, authorization_cookies_path)
-    catalog_page.accept_city_btn.click()
     phone_count, search_range = phone
-    # Выбираю 2 случайных телефона из 10
-    catalog_page.choice_telephone(driver, phone_count, search_range)
     phone_page = OnlinerMobilePhonePage(driver)
-    #Перехожу в сравнение через каталог, потому что onliner создает для каждых телефонов разные ссылки
-    catalog_page.comparison_link.click()
+    #Перехожу в сравнение телефонов
+    phone_page.compare_link().click()
     compare_page = ComparePage(driver)
     #Начинаю перебирать телефоны
     for phone_index in range(1, phone_count + 1):

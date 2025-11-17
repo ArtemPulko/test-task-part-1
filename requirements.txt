@@ -1,4 +1,5 @@
 webdriver-manager
+pytest-ordering
 selenium
 pytest
 numpy

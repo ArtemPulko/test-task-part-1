@@ -1,8 +1,8 @@
 from main.pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains
-import numpy as np
 import pytest
 
+@pytest.mark.run(order=2)
 @pytest.mark.parametrize('search',[(2, 10, [])])
 def test_select_phones(driver, search, authorization_cookies_path):
     """
@@ -16,7 +16,6 @@ def test_select_phones(driver, search, authorization_cookies_path):
     :param authorization_cookies_path: Путь к кукам для авторизации
     """
     catalog_page = OnlinerMobilePage(driver)
-    catalog_page.open()
     #Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
     catalog_page.authorization(driver, authorization_cookies_path)
     driver.implicitly_wait(5)
@@ -32,6 +31,7 @@ def test_select_phones(driver, search, authorization_cookies_path):
     #Проверить, что ссылка для сравнения существует
     assert catalog_page.comparison_link.is_displayed(), "Ссылка на сравнение не найдена"
 
+@pytest.mark.run(order=3)
 @pytest.mark.parametrize('params',[(10, 2, [],[])])
 def test_price_screen_range(driver, params, authorization_cookies_path):
     """
@@ -47,13 +47,7 @@ def test_price_screen_range(driver, params, authorization_cookies_path):
     :param authorization_cookies_path: Путь к кукам для авторизации
     """
     catalog_page = OnlinerMobilePage(driver)
-    catalog_page.open()
-    # Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    catalog_page.authorization(driver, authorization_cookies_path)
-    catalog_page.accept_city_btn.click()
     first_phons_of, phone_count, price_list, screen_size = params
-    # Выбираю 2 случайных телефона из 10
-    catalog_page.choice_telephone(driver, phone_count, first_phons_of)
     actions = ActionChains(driver)
     #Собираю информацию о телефонах
     for index in range(1, first_phons_of + 1):

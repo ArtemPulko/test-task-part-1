@@ -1,5 +1,8 @@
+import pytest
+
 from main.pages.onliner_page import OnlinerPage
 
+@pytest.mark.run(order=1)
 def test_mobile_phone_btn(driver):
     """
     Открыть категорию "Мобильные телефоны".
