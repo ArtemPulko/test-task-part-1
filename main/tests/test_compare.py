@@ -4,24 +4,27 @@ from main.pages.onliner_compare_page import ComparePage
 import pytest
 import time
 
-@pytest.mark.parametrize('phone_count', [2])
-def test_compare_phons(driver, phone_count, compare_cookies_path):
+@pytest.mark.parametrize('phone', [(2, 10)])
+def test_compare_phons(driver, phone, authorization_cookies_path):
     """
     Нажать на ссылку сравнения. Убедиться, что два телефона содержат правильную информацию
     (описанную в предыдущем шаге) и не совпадают друг с другом.
-    :param driver: Сетевой драйвер Chrome
-    :param phone_count: Количество телефонов в сравнении (по условию - 2)
-    :param compare_cookies_path: Путь к кукам для сравнения
+    :param driver: Сетевой драйвер Chrome.
+    :param phone: Содержит в себе:
+        phone_count: количество искомых телефонов (по условию - 2)
+        search_range: диапазон поиска первых телефонов (по условию - 10).
+    :param authorization_cookies_path: Путь к кукам для сравнения
     :return:
     """
     catalog_page = OnlinerMobilePage(driver)
     catalog_page.open()
-    #По условию телефоны должны соответствовать выбранным из теста: test_select_phones
-    #Поэтому загружаю куки с заранее подготовленными телефонами для обеспечения независимости тестов друг от друга
-    #Тест может не сработает если onliner перемешает телефоны в каталоге
-    catalog_page.set_compare(driver, compare_cookies_path)
+    # Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
+    catalog_page.authorization(driver, authorization_cookies_path)
+    catalog_page.accept_city_btn.click()
+    phone_count, search_range = phone
+    # Выбираю 2 случайных телефона из 10
+    catalog_page.choice_telephone(driver, phone_count, search_range)
     phone_page = OnlinerMobilePhonePage(driver)
-    time.sleep(15)
     #Перехожу в сравнение через каталог, потому что onliner создает для каждых телефонов разные ссылки
     catalog_page.comparison_link.click()
     compare_page = ComparePage(driver)

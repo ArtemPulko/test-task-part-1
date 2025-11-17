@@ -1,3 +1,5 @@
+import re
+
 from selenium.webdriver.common.by import By
 from main.pages.base_page import BasePage
 
@@ -44,13 +46,16 @@ class ComparePage(BasePage):
     def phone_ram(self, phone_index):
         """
         Свойство находит и возвращает объем оперативной памяти из таблицы характеристик телефона
-        :return: Значение объема оперативной памяти в формате - 8 ГБ
+        :return: Значение объема оперативной памяти
         """
         row = 1
         # Итерируюсь по таблице характеристик от первой строки до искомой
         while True:
             if self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[1]//span[@class='product-table__wrapper'])[{row}]")).text == "Объем оперативной памяти":
-                return self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text
+                print(self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text)
+                ram_str = self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text
+                ram = ram_str.split('ГБ')[0].strip()
+                return int(ram)
             else: row += 1
 
     def get_phone_params(self, phone_index):

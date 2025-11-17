@@ -3,22 +3,27 @@ from main.pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains, Keys
 import pytest
 
-@pytest.mark.parametrize('phone_index', [1])
-def test_phons_equals(driver,phone_index, compare_cookies_path):
+@pytest.mark.parametrize('phone_index', [(1,2,10)])
+def test_phons_equals(driver, phone_index, authorization_cookies_path):
     """
     Перейти на любой из выбранных телефонов.
     Проверить, совпадают ли параметры с предыдущей страницей
     (операционная система, размер экрана, диагональ экрана, объем оперативной памяти).
-    :param driver: Сетевой драйвер Chrome
-    :param phone_index: номер телефона по списку из тех что выбран для сравнения (в соответствии с условием может быть 1 или 2)
-    :param compare_cookies_path: Путь к кукам для сравнения
+    :param driver: Сетевой драйвер Chrome.
+    :param phone_index: Содержит в себе
+        phone_index: номер телефона по списку из тех что выбран для сравнения (в соответствии с условием может быть 1 или 2)
+        phone_count: количество искомых телефонов (по условию - 2)
+        search_range: диапазон поиска первых телефонов (по условию - 10).
+    :param authorization_cookies_path: Путь к кукам для сравнения
     """
     catalog_page = OnlinerMobilePage(driver)
     catalog_page.open()
-    #По условию телефоны должны соответствовать выбранным из теста: test_select_phones
-    #Поэтому загружаю куки с заранее подготовленными телефонами для обеспечения независимости тестов друг от друга
-    #Тест может не сработает если onliner перемешает телефоны в каталоге
-    catalog_page.set_compare(driver, compare_cookies_path)
+    # Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
+    catalog_page.authorization(driver, authorization_cookies_path)
+    catalog_page.accept_city_btn.click()
+    phone_index, phone_count, search_range = phone_index
+    # Выбираю 2 случайных телефона из 10
+    catalog_page.choice_telephone(driver, phone_count, search_range)
     actions = ActionChains(driver)
     #Листаю страницу до выбранного телефона (в противном случае информация не считывается)
     actions.move_to_element(catalog_page.selected_phone(phone_index)).perform()

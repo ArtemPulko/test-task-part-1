@@ -51,13 +51,16 @@ class OnlinerMobilePhonePage(BasePage):
     def phone_ram(self):
         """
         Свойство находит и возвращает объем оперативной памяти из таблицы характеристик телефона
-        :return: Значение объема оперативной памяти в формате - 8 ГБ
+        :return: Значение объема оперативной
         """
         row = 1
         # Итерируюсь по таблице характеристик от первой строки до искомой
         while True:
             if self.find_by_xpath((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[1]")).text == "Объем оперативной памяти":
-                return self.find_by_xpath((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[2]")).text
+                #ram = int(self.find_by_xpath((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[2]")).text.replace("ГБ", "").strip())
+                ram_str = self.find_by_xpath((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[2]")).text
+                ram = ram_str.split('ГБ')[0].strip()
+                return int(ram)
             else: row += 1
 
     def get_phone_params(self):

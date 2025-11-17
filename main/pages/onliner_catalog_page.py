@@ -1,3 +1,4 @@
+import numpy as np
 from selenium.webdriver import Keys, ActionChains
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
@@ -64,8 +65,8 @@ class OnlinerMobilePage(BasePage):
         # Формула phone_index * 2 - 1 позволяет искать в описании только объем оперативной памяти
         locator = (By.XPATH, f"(//div[@class='catalog-form__parameter catalog-helpers_hide_tablet']//div[@class='catalog-form__description catalog-form__description_primary catalog-form__description_small-additional catalog-form__description_bullet catalog-form__description_condensed'][5])[{phone_index * 2 - 1}]")
         ram_element = self.find_by_xpath(locator)
-        ram = ram_element.text.replace('ОЗУ ', '')
-        return ram
+        ram = re.search(r' (.+?) ', ram_element.text).group(1)
+        return int(ram)
 
     def phone_diagonal(self, phone_index):
         """
@@ -227,4 +228,17 @@ class OnlinerMobilePage(BasePage):
         max_selector.click()
         Select(max_selector).select_by_visible_text(screen_size[1])
 
-
+    def choice_telephone(self, driver, phone_count, search_range):
+        selected_mobile_phone_list = []
+        unique_numbers = np.random.choice(np.arange(1, search_range + 1), phone_count, replace=False)
+        while len(selected_mobile_phone_list) < phone_count:
+            # Если вдруг окажется что искомых телефонов больше чем диапазон их поиска
+            if len(selected_mobile_phone_list) == search_range:
+                break
+            # Определяю порядковый номер телефона в каталоге
+            random_phone = unique_numbers[len(selected_mobile_phone_list)]
+            driver.implicitly_wait(5)
+            # Добавляю телефон в сравнение
+            self.mobile_check_box(random_phone).click()
+            selected_mobile_phone_list.append(self.mobile_check_box(random_phone))
+        return selected_mobile_phone_list
