@@ -1,9 +1,15 @@
+import random
+import time
+
 from main.pages.onliner_catalog_page import OnlinerMobilePage
 from selenium.webdriver import ActionChains
 import pytest
 
+from main.products.MobilePhone import MobilePhone
+
+
 @pytest.mark.run(order=2)
-@pytest.mark.parametrize('search',[(2, 10, [])])
+@pytest.mark.parametrize('search',[(2, 10)])
 def test_select_phones(driver, search, authorization_cookies_path):
     """
     Найти два любых телефона из первых 10 и добавить их для сравнения.
@@ -12,24 +18,25 @@ def test_select_phones(driver, search, authorization_cookies_path):
     :param search: Включает в себя следующее
         phone_count: количество искомых телефонов (по условию - 2)
         search_range: диапазон поиска первых телефонов (по условию - 10)
-        selected_mobile_phone_list: пустой список, заготовка для поиска телефонов.
     :param authorization_cookies_path: Путь к кукам для авторизации
     """
     catalog_page = OnlinerMobilePage(driver)
     #Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    catalog_page.authorization(driver, authorization_cookies_path)
-    driver.implicitly_wait(5)
+    #catalog_page.authorization(driver, authorization_cookies_path)
     #Закрываю еще одно всплывшее окно
-    catalog_page.accept_city_btn.click()
-    phone_count, search_range, selected_mobile_phone_list = search
-    #Выбираю 2 случайных телефона из 10
-    selected_mobile_phone_list = catalog_page.choice_telephone(driver, phone_count, search_range)
-    #Проверить, что флажки установлены.
-    for phone in selected_mobile_phone_list:
-        if phone.get_attribute("title") != "В сравнении":
-            assert False, "Не все флажки установлены"
-    #Проверить, что ссылка для сравнения существует
-    assert catalog_page.comparison_link.is_displayed(), "Ссылка на сравнение не найдена"
+#    catalog_page.accept_city_btn.click()
+    phone_count, search_range = search
+    #Добавляю в сравнение два случайных телефона
+    driver.save_screenshot("element_to_be_clickable.png")
+    for i in range(phone_count):
+        phon_index = random.randrange(1 , search_range + 1)
+        print("\n\n")
+        print(phon_index)
+        print("\n\n")
+        catalog_page.phone_check_box(phon_index).click()
+
+    #Проверить, что ссылка для сравнения существует и флажки установлены
+    assert catalog_page.comparison_link.is_displayed() and catalog_page.flags_in_place(phone_count), "Ссылка на сравнение не найдена или флажки не установлены"
 
 @pytest.mark.run(order=3)
 @pytest.mark.parametrize('params',[(10, 2, [],[])])
@@ -47,33 +54,9 @@ def test_price_screen_range(driver, params, authorization_cookies_path):
     :param authorization_cookies_path: Путь к кукам для авторизации
     """
     catalog_page = OnlinerMobilePage(driver)
-    first_phons_of, phone_count, price_list, screen_size = params
-    actions = ActionChains(driver)
-    #Собираю информацию о телефонах
-    for index in range(1, first_phons_of + 1):
-        if catalog_page.phone_by_index_is_selected(index): #Не стабильный момент
-            driver.implicitly_wait(5)
-            #Листаю страницу до выбранного телефона (в противно случае не считывало информацию о нем)
-            actions.move_to_element(catalog_page.mobile_check_box(index)).perform()
-            #Сохраняю цену
-            price_list.append(catalog_page.get_price_by_phone(index))
-            #Сохраняю размер экрана
-            screen_size.append(catalog_page.phone_diagonal(index))
-    #Проверка на то, что выбранные телефоны по-прежнему отображаются и флажки установлены.
-    if len(price_list) < phone_count:
-        #В price_list находятся только те телефоны у которых флажки установлены
-        assert False, "Флажки не установлены "
-    #Далее сортирую по возрастанию собранную информацию по возрастанию
-    price_list.sort()
-    screen_size.sort()
-    #Ввожу минимальную цену
-    catalog_page.enter_min_price(price_list[0])
-    driver.implicitly_wait(5)
-    #Ввожу максимальную цену
-    catalog_page.enter_max_price(price_list[1])
-    driver.implicitly_wait(5)
-    #Выбираю диагональ экрана
-    catalog_page.enter_screen_size(screen_size) #Не стабильный момент
-    #Если тест дойдет до сюда значит все условия выполнены и тест считается успешным
-    assert True
-
+    first_phons_of, phone_count, phone_list, screen_size = params
+    for i in range(1, phone_count + 1):
+        phone_list.append(catalog_page.create_phone_with_characteristics(i))
+    catalog_page.enter_min_max_price(MobilePhone.min_max_price(phone_list))
+    catalog_page.enter_min_max_diagonal(MobilePhone.min_max_diagonal(phone_list))
+    assert catalog_page.flags_in_place(phone_count), "Флажки не установлены"
