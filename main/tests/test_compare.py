@@ -2,6 +2,8 @@ from main.pages.onliner_phone_page import OnlinerMobilePhonePage
 from main.pages.onliner_compare_page import ComparePage
 import pytest
 
+from main.products.MobilePhone import MobilePhone
+
 @pytest.mark.run(order=5)
 @pytest.mark.parametrize('phone', [(2, 10)])
 def test_compare_phons(driver, phone, authorization_cookies_path):
@@ -17,22 +19,16 @@ def test_compare_phons(driver, phone, authorization_cookies_path):
     """
     phone_count, search_range = phone
     phone_page = OnlinerMobilePhonePage(driver)
-    #Перехожу в сравнение телефонов
-    phone_page.compare_link().click()
     compare_page = ComparePage(driver)
-    #Начинаю перебирать телефоны
-    for phone_index in range(1, phone_count + 1):
-        #Создаю словарь с характеристиками телефона из сравнения
-        param_from_compare = compare_page.get_phone_params(phone_index)
-        #Перехожу на страницу с описанием телефона
-        compare_page.open_phone_link(phone_index).click()
-        # Создаю словарь с характеристиками этого же телефона из его описания
-        param_from_product = phone_page.get_phone_params()
-        #Убеждаюсь, что два телефона содержат правильную информацию.
-        #Использую метод сравнивания характеристик
-        if phone_page.phons_param_is_equal(param_from_product, param_from_compare):
-            #Возвращаюсь в сравнение, чтобы проверить другой телефон
-            phone_page.compare_link().click()
-        else: assert False, "Данные телефонов не совпадают"
-    #Проверяю не совпадают ли телефоны друг с другом.
-    assert not compare_page.phons_name(1) == compare_page.phons_name(2), "В сравнении одинаковые телефоны"
+    #Перехожу в сравнение телефонов
+    phone_page.compare_link.click()
+    compare_phone1, compare_phone2 = compare_page.extract_from_compare_characteristic
+    phons = []
+    for phone_index in range(phone_count):
+        compare_page.get_phone_link(phone_index + 1).click()
+        phons.append(phone_page.extract_from_characteristics_extended)
+        phone_page.compare_link.click()
+    assert (MobilePhone.is_equals(compare_phone1, phons[0])
+            and MobilePhone.is_equals(compare_phone2, phons[1])), "Телефоны содержат не правильную информацию"
+
+

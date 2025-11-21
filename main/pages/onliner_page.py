@@ -11,9 +11,7 @@ class OnlinerPage(BasePage):
         super().__init__(driver)
 
     def open(self):
-        """
-        Метод для перехода на страницу по ссылке.
-        """
+        """Метод для перехода на страницу по ссылке."""
         self.driver.get("https://www.onliner.by/")
 
     @property

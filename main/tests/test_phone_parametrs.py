@@ -1,6 +1,6 @@
 from main.pages.onliner_phone_page import OnlinerMobilePhonePage
 from main.pages.onliner_catalog_page import OnlinerMobilePage
-from selenium.webdriver import ActionChains, Keys
+from main.products.MobilePhone import MobilePhone
 import pytest
 
 @pytest.mark.run(order=4)
@@ -19,18 +19,10 @@ def test_phons_equals(driver, phone_index, authorization_cookies_path):
     """
     catalog_page = OnlinerMobilePage(driver)
     phone_index, phone_count, search_range = phone_index
-    actions = ActionChains(driver)
-    #Листаю страницу до выбранного телефона (в противном случае информация не считывается)
-    actions.move_to_element(catalog_page.selected_phone(phone_index)).perform()
-    actions.key_down(Keys.PAGE_DOWN).perform()
-    #Считываю параметры из описания телефона в каталоге
-    phone_from_catalog = catalog_page.get_phone_params(phone_index)
-    driver.implicitly_wait(5)
-    #Перехожу на страницу подробного описания телефона
-    catalog_page.get_phone(phone_index).click()
+    phone_from_catalog = catalog_page.extract_from_characteristics(phone_index)
+    catalog_page.open_phone_link(phone_index).click()
     phone_params_page = OnlinerMobilePhonePage(driver)
-    #Считываю необходимые данные
-    phone = phone_params_page.get_phone_params()
+    phone_from_prod_info = phone_params_page.extract_from_characteristics_extended
     #Перейти на любой из выбранных телефонов и проверить, совпадают ли параметры с предыдущей страницей
-    assert phone_params_page.phons_param_is_equal(phone_from_catalog, phone), "Параметры телефонов не совпадают"
+    assert MobilePhone.is_equals(phone_from_catalog, phone_from_prod_info), 'Параметры телефонов не совпадают'
 

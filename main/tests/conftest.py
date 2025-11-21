@@ -8,7 +8,7 @@ import pytest
 @pytest.fixture(scope='session')
 def driver():
     options = Options()
-    #options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36')
+    options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36')
     options.add_argument("--window-size=1680,1050")
     options.add_argument('--headless')
     project_root = Path(__file__).parents[2]

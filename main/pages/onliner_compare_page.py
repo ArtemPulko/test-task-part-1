@@ -1,91 +1,51 @@
-import re
+from decimal import Decimal
 
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from main.pages.base_page import BasePage
+from main.products.MobilePhone import MobilePhone
+from main.products.PhoneCharacteristic import PhoneCharacteristic
+
+phone_name_xpath = "(//a[@class='product-summary__figure']//span)[{PI}]"
+compare_characteristic_xpath = '//tbody[5]//tr[contains(@class, "product-table__row")][{row}]/td[1]'
+value1_characteristic_xpath = '//tbody[5]//tr[contains(@class, "product-table__row")][{row}]/td[3]'
+value2_characteristic_xpath = '//tbody[5]//tr[contains(@class, "product-table__row")][{row}]/td[4]'
 
 class ComparePage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
 
-    def phone_os(self, phone_index):
-        """
-        Свойство находит и возвращает название операционной системы из таблицы характеристик телефона.
-        :return: Название операционной системы.
-        """
-        row = 1
-        # Итерируюсь по таблице характеристик от первой строки до искомой
-        while True:
-            if self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[1]//span[@class='product-table__wrapper'])[{row}]")).text == "Операционная система":
-                return self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text
-            else: row += 1
-
-    def phone_screen(self, phone_index):
-        """
-        Свойство находит и возвращает разрешение экрана из таблицы характеристик телефона.
-        :return: Значение разрешения экрана в формате - 1280х720
-        """
-        row = 1
-        # Итерируюсь по таблице характеристик от первой строки до искомой
-        while True:
-            if self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[1]//span[@class='product-table__wrapper'])[{row}]")).text == "Разрешение экрана":
-                return self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text
-            else: row += 1
-
-    def phone_diagonal(self, phone_index):
-        """
-        Свойство находит и возвращает размер экрана из таблицы характеристик телефона
-        :return: Значение размера экрана в формате - 6.1"
-        """
-        row = 1
-        # Итерируюсь по таблице характеристик от первой строки до искомой
-        while True:
-            if self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[1]//span[@class='product-table__wrapper'])[{row}]")).text == "Размер экрана":
-                return self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text
-            else: row += 1
-
-    def phone_ram(self, phone_index):
-        """
-        Свойство находит и возвращает объем оперативной памяти из таблицы характеристик телефона
-        :return: Значение объема оперативной памяти
-        """
-        row = 1
-        # Итерируюсь по таблице характеристик от первой строки до искомой
-        while True:
-            if self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[1]//span[@class='product-table__wrapper'])[{row}]")).text == "Объем оперативной памяти":
-                print(self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text)
-                ram_str = self.find_by_xpath((By.XPATH, f"(//tbody[@class='product-table__group'][2]//tr[contains(@class,'product-table__row product-table__row_parameter')]//td[{phone_index + 2}]//span[@class='product-table__wrapper'])[{row}]")).text
-                ram = ram_str.split('ГБ')[0].strip()
-                return int(ram)
-            else: row += 1
-
-    def get_phone_params(self, phone_index):
-        """
-        Метод составляет словарь из свойств телефона
-        (операционная система, размер экрана, диагональ экрана, объем оперативной памяти).
-        :param phone_index: Порядковый номер телефона в сравнении.
-        :return: Словарь со свойствами телефона из сравнения.
-        """
-        params = {}
-        params["ОС"] = self.phone_os(phone_index)
-        params["Размер экрана"] = self.phone_diagonal(phone_index)
-        params["Разрешение экрана"] = self.phone_screen(phone_index)
-        params["ОЗУ"] = self.phone_ram(phone_index)
-        return params
-
-    def open_phone_link(self, phone_index):
-        """
-        Метод возвращающий ссылку для перехода в подробное описание телефона.
-        :param phone_index: Порядковый номер телефона в сравнении.
-        :return: WebElement ссылки подробного описания.
-        """
-        locator = (By.XPATH, f"(//tr[@class='product-table__row product-table__row_header product-table__row_top']//span[@class='product-summary__caption'])[{phone_index}]")
-        return self.find_by_xpath(locator)
-
-    def phons_name(self, phone_index):
+    def get_phone_link(self, phone_index):
         """
         Метод возвращающий названия телефона.
         :param phone_index: Порядковый номер телефона в сравнении.
         :return: Название телефона.
         """
-        phon_name_locator = (By.XPATH, f"(//span[@class='product-summary__caption'])[{phone_index}]")
-        return self.find_by_xpath(phon_name_locator).text
+        return self.find_by_xpath_clickable_elem((By.XPATH, phone_name_xpath.replace('{PI}', str(phone_index))))
+
+    @property
+    def extract_from_compare_characteristic(self):
+        phone1 = MobilePhone()
+        phone2 = MobilePhone()
+        row = 2
+        while True:
+            try:
+                WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH,compare_characteristic_xpath.replace('{row}', str(row)))))
+                characteristic = self.find_by_xpath((By.XPATH,compare_characteristic_xpath.replace('{row}', str(row)))).text
+                value1 = self.find_by_xpath((By.XPATH,value1_characteristic_xpath.replace('{row}', str(row)))).text
+                value2 = self.find_by_xpath((By.XPATH,value2_characteristic_xpath.replace('{row}', str(row)))).text
+                if characteristic == PhoneCharacteristic.ram.value:
+                    value1 = int(value1.replace(' ГБ',''))
+                    value2 = int(value2.replace(' ГБ',''))
+                if characteristic == PhoneCharacteristic.diagonal.value:
+                    value1 = Decimal(value1.replace('"', ''))
+                    value2 = Decimal(value2.replace('"', ''))
+                phone1.add_characteristic(characteristic, value1)
+                phone2.add_characteristic(characteristic, value2)
+                row += 1
+            except TimeoutException:
+                break
+
+        return phone1, phone2

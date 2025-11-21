@@ -15,6 +15,7 @@ class BasePage:
         :return: Искомый WebElement.
         """
         wait = WebDriverWait(self.driver, 10)
+
         return  wait.until(EC.visibility_of_element_located(locator))
 
     def find_by_xpath_presence_elem(self, locator):
@@ -32,8 +33,9 @@ class BasePage:
         :param locator: Кортеж вида (By.XPATH, XPATH).
         :return: Искомый WebElement.
         """
-
         wait = WebDriverWait(self.driver, 10)
+        print("\n")
+        print(locator)
         return  wait.until(EC.element_to_be_clickable(locator))
 
     @staticmethod

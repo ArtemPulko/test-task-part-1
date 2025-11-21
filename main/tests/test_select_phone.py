@@ -1,12 +1,9 @@
-import random
-import time
-
 from main.pages.onliner_catalog_page import OnlinerMobilePage
-from selenium.webdriver import ActionChains
-import pytest
-
 from main.products.MobilePhone import MobilePhone
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver import  Keys
+import random
+import pytest
 
 @pytest.mark.run(order=2)
 @pytest.mark.parametrize('search',[(2, 10)])
@@ -22,19 +19,14 @@ def test_select_phones(driver, search, authorization_cookies_path):
     """
     catalog_page = OnlinerMobilePage(driver)
     #Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    #catalog_page.authorization(driver, authorization_cookies_path)
+    catalog_page.authorization(driver, authorization_cookies_path)
     #Закрываю еще одно всплывшее окно
-#    catalog_page.accept_city_btn.click()
+    catalog_page.accept_city_btn.click()
     phone_count, search_range = search
-    #Добавляю в сравнение два случайных телефона
-    driver.save_screenshot("element_to_be_clickable.png")
+    driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.END)#  !!!!!!!
+    phon_index = random.sample(range(1, search_range + 1), phone_count)
     for i in range(phone_count):
-        phon_index = random.randrange(1 , search_range + 1)
-        print("\n\n")
-        print(phon_index)
-        print("\n\n")
-        catalog_page.phone_check_box(phon_index).click()
-
+        catalog_page.phone_check_box(phon_index[i]).click()
     #Проверить, что ссылка для сравнения существует и флажки установлены
     assert catalog_page.comparison_link.is_displayed() and catalog_page.flags_in_place(phone_count), "Ссылка на сравнение не найдена или флажки не установлены"
 
@@ -56,7 +48,8 @@ def test_price_screen_range(driver, params, authorization_cookies_path):
     catalog_page = OnlinerMobilePage(driver)
     first_phons_of, phone_count, phone_list, screen_size = params
     for i in range(1, phone_count + 1):
-        phone_list.append(catalog_page.create_phone_with_characteristics(i))
+        phone_list.append(catalog_page.extract_from_characteristics(i))
     catalog_page.enter_min_max_price(MobilePhone.min_max_price(phone_list))
     catalog_page.enter_min_max_diagonal(MobilePhone.min_max_diagonal(phone_list))
+    #Убедиться, что выбранные телефоны по-прежнему отображаются и флажки установлены.
     assert catalog_page.flags_in_place(phone_count), "Флажки не установлены"
