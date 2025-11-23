@@ -15,6 +15,10 @@
 •	Файл test_phone_parametrs содержит тест для выполнения задачи № 4  
 •	Файл test_compare содержит тесты для выполнения задачи № 5  
 ## Установка
+```
+git clone https://github.com/ArtemPulko/test-task-part-1.git
+```
+
 Перед запуском тестов необходимо выполнить:  
 ```
 pip install -r requirements.txt
