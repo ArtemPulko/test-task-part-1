@@ -19,12 +19,6 @@
 
 Файл test_compare содержит тесты для выполнения задачи №5
 
-Перед запуском тестов необходимо установить:
+Перед запуском тестов необходимо выполнить:
 
-pip install pytest-ordering
-
-pip install selenium
-
-pip install pytest
-
-Список всех пакетов можно найти в файле requirements.txt
+pip install -r requirements.txt
