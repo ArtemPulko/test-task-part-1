@@ -13,7 +13,7 @@
 
 Файл test_open_catalog содеожит тесты для выполнения задачи №1
 
-Файл test_select_phone содержит тесты для выполнения задаи №2,3
+Файл test_select_phone содержит тесты для выполнения задачи №2,3
 
 Файл test_phone_parametrs содержит тест для выполнения задачи №4
 
@@ -32,5 +32,3 @@ pip install pytest
 pip install numpy
 
 Список всех пакетов можно найти в файле requirements.txt
-
-Запуск всех тестов через терминал: python main.py
