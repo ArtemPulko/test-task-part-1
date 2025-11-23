@@ -32,3 +32,6 @@ def get_chromedriver_path(path):
       project_root = path.parents[2]
       return project_root / 'drivers' / driver_name
 ```
+В модуле ```drivers``` уже имеются драйвера для браузера Chrome  
+    chromedriver.exe  v142.0.7444.175 для win64  
+    chromedriver v142.0.7444.175 для linux64
