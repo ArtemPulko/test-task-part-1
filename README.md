@@ -26,7 +26,6 @@ pip install -r requirements.txt
 Для установки драйвера необходимо:  
 1. Поместить файл с драйвером в модуль ```drivers```
 2. В  ```__init__.py``` переменной ```driver_name``` писвоить имя файла необходимого драйвера   
-ПРИМЕР:
 ```python
 def get_chromedriver_path(path):
       driver_name = 'chromedriver.exe' # Тесты будут использовать драйвер - chromedriver.exe
