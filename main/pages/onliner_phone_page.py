@@ -1,27 +1,33 @@
-from selenium.webdriver.support.wait import WebDriverWait
+from main.pages.locators.phone_info_locators import PhoneInfoLocators as PL
 from selenium.webdriver.support import expected_conditions as EC
-from main.products.PhoneCharacteristic import PhoneCharacteristic
-from main.products.MobilePhone import MobilePhone
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.wait import WebDriverWait
+from main.products import PhoneCharacteristic
 from selenium.common import TimeoutException
-from selenium.webdriver.common.by import By
 from main.pages.base_page import BasePage
+from main.products import MobilePhone
 from decimal import Decimal
-
-compare_link_locator = (By.XPATH, "//a[@class='catalog-interaction__sub catalog-interaction__sub_main']")
 
 class OnlinerMobilePhonePage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
 
     @property
-    def extract_from_characteristics_extended(self):
+    def extract_from_characteristics_extended(self) -> MobilePhone:
+        """
+        Свойство считывает информацию из таблицы характеристик и возвращает телефон с данной информацией
+        :return: Телефон с характеристиками
+        """
         phone = MobilePhone()
         row = 2
         while True:
             try:
-                WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[1]")))
-                characteristic = self.find_by_xpath((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[1]")).text
-                value = self.find_by_xpath((By.XPATH, f"//table[@class='product-specs__table']/tbody[2]/tr[{row}]/td[2]")).text
+                #Проверка на конец таблицы характеристик
+                WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located(PL.xpath_characteristic.upgrade(row)))
+                #Считывание названия характеристики
+                characteristic = self.find_by_xpath(PL.xpath_characteristic.upgrade(row)).text
+                #Считывание значения характеристики
+                value = self.find_by_xpath(PL.xpath_value.upgrade(row)).text
                 if characteristic == PhoneCharacteristic.ram.value:
                     value = int(value.replace(' ГБ',''))
                 if characteristic == PhoneCharacteristic.diagonal.value:
@@ -33,10 +39,9 @@ class OnlinerMobilePhonePage(BasePage):
         return phone
 
     @property
-    def compare_link(self):
+    def compare_link(self) -> WebElement:
         """
         Свойство возвращающее ссылку на сравнение выбранных телефонов.
         :return: WebElement ссылки на сравнение.
         """
-        self.driver.save_screenshot("onliner_phone_page.png")
-        return self.find_by_xpath_clickable_elem(compare_link_locator)
+        return self.find_by_xpath_clickable_elem(PL.compare_link.value)

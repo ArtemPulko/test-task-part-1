@@ -1,11 +1,11 @@
-from pathlib import Path
-
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
+from pathlib import Path
 import pytest
 
-@pytest.fixture(scope='session')
+
+@pytest.fixture(autouse=True, scope='session')
 def driver():
     options = Options()
     options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36')
@@ -18,6 +18,7 @@ def driver():
     #chrome_browser.maximize_window()
     yield chrome_browser
     chrome_browser.quit()
+
 @pytest.fixture
 def authorization_cookies_path():
     project_root = Path(__file__).parents[2]

@@ -1,13 +1,11 @@
-from main.pages.onliner_catalog_page import OnlinerMobilePage
-from main.products.MobilePhone import MobilePhone
-from selenium.webdriver.common.by import By
-from selenium.webdriver import  Keys
+from main.pages import OnlinerCatalogPage
+from main.products import MobilePhone
 import random
 import pytest
 
 @pytest.mark.run(order=2)
 @pytest.mark.parametrize('search',[(2, 10)])
-def test_select_phones(driver, search, authorization_cookies_path):
+def test_select_phones(driver, search):
     """
     Найти два любых телефона из первых 10 и добавить их для сравнения.
     Проверить, что ссылка для сравнения существует и флажки установлены.
@@ -15,41 +13,39 @@ def test_select_phones(driver, search, authorization_cookies_path):
     :param search: Включает в себя следующее
         phone_count: количество искомых телефонов (по условию - 2)
         search_range: диапазон поиска первых телефонов (по условию - 10)
-    :param authorization_cookies_path: Путь к кукам для авторизации
     """
-    catalog_page = OnlinerMobilePage(driver)
-    #Авторизация на сайте, необходима чтобы избавится от постоянно всплывающих окон
-    catalog_page.authorization(driver, authorization_cookies_path)
-    #Закрываю еще одно всплывшее окно
+    catalog_page = OnlinerCatalogPage(driver)
+    #Закрываю всплывшее окно
     catalog_page.accept_city_btn.click()
     phone_count, search_range = search
-    driver.find_element(By.TAG_NAME, 'html').send_keys(Keys.END)#  !!!!!!!
-    phon_index = random.sample(range(1, search_range + 1), phone_count)
+    #Подгружаю 7-30 телефоны
+    catalog_page.load_all_phons()
     for i in range(phone_count):
-        catalog_page.phone_check_box(phon_index[i]).click()
+        catalog_page.phone_check_box(random.randint(1, search_range - i)).click()
     #Проверить, что ссылка для сравнения существует и флажки установлены
-    assert catalog_page.comparison_link.is_displayed() and catalog_page.flags_in_place(phone_count), "Ссылка на сравнение не найдена или флажки не установлены"
+    assert catalog_page.comparison_link.is_displayed(), "Ссылка на сравнение не найдена"
+    assert catalog_page.flags_in_place(phone_count), "Флажки не установлены"
 
 @pytest.mark.run(order=3)
-@pytest.mark.parametrize('params',[(10, 2, [],[])])
-def test_price_screen_range(driver, params, authorization_cookies_path):
+@pytest.mark.parametrize('params',[(2, [])])
+def test_price_screen_range(driver, params):
     """
     Установить параметры поиска: цена (минимальная и максимальная),
     размер экрана (минимальный и максимальный) - соответствующие минимальным и максимальным параметрам выбранных телефонов.
     Убедиться, что выбранные телефоны по-прежнему отображаются и флажки установлены.
     :param driver: Сетевой драйвер Chrome.
     :param params: Включает в себя следующее
-        first_phons_of: Первые 10 телефонов
         phone_count: Количество выбранных телефонов (как по условию - 2)
         price_list: Пустой список, заготовка под цены телефонов
-        screen_size Пустой список, заготовка под размеры экранов
-    :param authorization_cookies_path: Путь к кукам для авторизации
     """
-    catalog_page = OnlinerMobilePage(driver)
-    first_phons_of, phone_count, phone_list, screen_size = params
+    catalog_page = OnlinerCatalogPage(driver)
+    phone_count, phone_list = params
+    # Считываю информацию о телефонах из описания в каталоге
     for i in range(1, phone_count + 1):
-        phone_list.append(catalog_page.extract_from_characteristics(i))
+        phone_list.append(catalog_page.extract_from_characteristics(i, False))
+    # Ввод минимальной и максимальной цены
     catalog_page.enter_min_max_price(MobilePhone.min_max_price(phone_list))
+    # Ввод минимального и максимального размера экрана
     catalog_page.enter_min_max_diagonal(MobilePhone.min_max_diagonal(phone_list))
-    #Убедиться, что выбранные телефоны по-прежнему отображаются и флажки установлены.
-    assert catalog_page.flags_in_place(phone_count), "Флажки не установлены"
+    # Убедиться, что выбранные телефоны по-прежнему отображаются и флажки установлены.
+    assert catalog_page.flags_in_place(phone_count), "Выбранные телефоны не отображаются"

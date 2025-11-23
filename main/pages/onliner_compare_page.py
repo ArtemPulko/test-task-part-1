@@ -1,41 +1,52 @@
-from decimal import Decimal
-
-from selenium.common import TimeoutException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
+from main.pages.locators.in_compare_locators import CompareLocator as CL
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.wait import WebDriverWait
+from main.products import PhoneCharacteristic
+from selenium.common import TimeoutException
 from main.pages.base_page import BasePage
-from main.products.MobilePhone import MobilePhone
-from main.products.PhoneCharacteristic import PhoneCharacteristic
-
-phone_name_xpath = "(//a[@class='product-summary__figure']//span)[{PI}]"
-compare_characteristic_xpath = '//tbody[5]//tr[contains(@class, "product-table__row")][{row}]/td[1]'
-value1_characteristic_xpath = '//tbody[5]//tr[contains(@class, "product-table__row")][{row}]/td[3]'
-value2_characteristic_xpath = '//tbody[5]//tr[contains(@class, "product-table__row")][{row}]/td[4]'
+from main.products import MobilePhone
+from decimal import Decimal
 
 class ComparePage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
 
-    def get_phone_link(self, phone_index):
+    def get_phone_link(self, phone_index: int) -> WebElement:
         """
-        Метод возвращающий названия телефона.
+        Метод возвращающий ссылку на характеристики телефона.
+        :param phone_index: Порядковый номер телефона в сравнении.
+        :return: WebElement ссылки на телефон.
+        """
+        return self.find_by_xpath_clickable_elem(CL.phone_name_xpath.upgrade(phone_index))
+
+    def get_phone_name(self, phone_index: int) -> str:
+        """
+        Метод возвращающий название телефона.
         :param phone_index: Порядковый номер телефона в сравнении.
         :return: Название телефона.
         """
-        return self.find_by_xpath_clickable_elem((By.XPATH, phone_name_xpath.replace('{PI}', str(phone_index))))
+        return self.find_by_xpath_clickable_elem(CL.phone_name_xpath.upgrade(phone_index)).text
 
     @property
-    def extract_from_compare_characteristic(self):
+    def extract_from_compare_characteristic(self) -> tuple[MobilePhone, MobilePhone]:
+        """
+        Свойство считывает информацию из таблицы характеристик и возвращает картеж из двух телефонов с данной информацией
+        :return: Картеж из двух телефонов содержащих информацию из первой таблицы характеристик
+        """
         phone1 = MobilePhone()
         phone2 = MobilePhone()
         row = 2
         while True:
             try:
-                WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH,compare_characteristic_xpath.replace('{row}', str(row)))))
-                characteristic = self.find_by_xpath((By.XPATH,compare_characteristic_xpath.replace('{row}', str(row)))).text
-                value1 = self.find_by_xpath((By.XPATH,value1_characteristic_xpath.replace('{row}', str(row)))).text
-                value2 = self.find_by_xpath((By.XPATH,value2_characteristic_xpath.replace('{row}', str(row)))).text
+                #Проверка на конец таблицы характеристик
+                WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located(CL.characteristic_xpath.upgrade(row)))
+                #Считывание названия характеристики
+                characteristic = self.find_by_xpath(CL.characteristic_xpath.upgrade(row)).text
+                #Считывание значения характеристики первого телефона
+                value1 = self.find_by_xpath(CL.value1_xpath.upgrade(row)).text
+                #Считывание значения характеристики второго телефона
+                value2 = self.find_by_xpath(CL.value2_xpath.upgrade(row)).text
                 if characteristic == PhoneCharacteristic.ram.value:
                     value1 = int(value1.replace(' ГБ',''))
                     value2 = int(value2.replace(' ГБ',''))
@@ -47,5 +58,4 @@ class ComparePage(BasePage):
                 row += 1
             except TimeoutException:
                 break
-
         return phone1, phone2
