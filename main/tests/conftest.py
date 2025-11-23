@@ -5,8 +5,6 @@ from selenium import webdriver
 from pathlib import Path
 import pytest
 
-
-
 @pytest.fixture(autouse=True, scope='session')
 def driver():
     options = Options()
