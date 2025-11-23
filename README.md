@@ -21,14 +21,10 @@
 
 Перед запуском тестов необходимо установить:
 
-pip install webdriver-manager
-
 pip install pytest-ordering
 
 pip install selenium
 
 pip install pytest
-
-pip install numpy
 
 Список всех пакетов можно найти в файле requirements.txt
