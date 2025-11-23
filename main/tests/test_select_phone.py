@@ -15,8 +15,6 @@ def test_select_phones(driver, search):
         search_range: диапазон поиска первых телефонов (по условию - 10)
     """
     catalog_page = OnlinerCatalogPage(driver)
-    #Закрываю всплывшее окно
-    catalog_page.accept_city_btn.click()
     phone_count, search_range = search
     #Подгружаю 7-30 телефоны
     catalog_page.load_all_phons()

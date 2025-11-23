@@ -10,7 +10,6 @@ from main.pages.base_page import BasePage
 from main.products import MobilePhone
 from selenium.webdriver import Keys
 from decimal import Decimal
-import json
 import re
 
 class OnlinerCatalogPage(BasePage):
@@ -156,7 +155,7 @@ class OnlinerCatalogPage(BasePage):
             self.scroll_to_element(diagonal_select)
             diagonal_select.click()
             Select(diagonal_select).select_by_visible_text(diagonal_str)
-            # Ожидает пока обновится список телефонов в каталоге после добавления фильтров
+            # Ожидает пока не исчезнет вэб элемент блокирующий телефоны в каталоге на время применения фильтров
             WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located(CL.offers.value))
 
     def enter_min_max_price(self, min_max_price: tuple[Decimal, Decimal]):
@@ -171,7 +170,7 @@ class OnlinerCatalogPage(BasePage):
             for number in price_str:
                 if number == '.' : price_input.send_keys('.')
                 else: price_input.send_keys(number)
-            # Ожидает пока обновится список телефонов в каталоге после добавления фильтров
+            # Ожидает пока не появится веб элемент блокирующий телефоны в каталоге на время применения фильтров
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(CL.offers.value))
 
     @property
