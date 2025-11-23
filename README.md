@@ -21,7 +21,7 @@ git clone https://github.com/ArtemPulko/test-task-part-1.git
 
 Перед запуском тестов необходимо выполнить:  
 ```
-pip install -r requirements.txt
+pip install -r test-task-part-1/requirements.txt
 ```  
 Для установки драйвера необходимо:  
 1. Поместить файл с драйвером в модуль ```drivers```
